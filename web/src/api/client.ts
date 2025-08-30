@@ -123,6 +123,15 @@ export const api = {
     },
   },
 
+  // Users
+  users: {
+    list: () => apiClient.get('/users'),
+    create: (data: any) => apiClient.post('/users', data),
+    update: (id: number, data: any) => 
+      apiClient.put(`/users/${id}`, data),
+    delete: (id: number) => apiClient.delete(`/users/${id}`),
+  },
+
   // Health check
   health: () => apiClient.get('/healthz'),
 }

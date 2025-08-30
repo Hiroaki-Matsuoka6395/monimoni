@@ -6,7 +6,7 @@ import logging
 import time
 
 from .settings import settings
-from .routers import auth, transactions, transactions_debug, categories, accounts, budgets, reports, files
+from .routers import auth, transactions, transactions_debug, categories, accounts, users, budgets, reports, files
 
 # Configure logging
 logging.basicConfig(
@@ -78,6 +78,7 @@ app.include_router(transactions.router, prefix="/api/transactions", tags=["Trans
 app.include_router(transactions_debug.router, prefix="/api/debug", tags=["Debug"])
 app.include_router(categories.router, prefix="/api/categories", tags=["Categories"])
 app.include_router(accounts.router, prefix="/api/accounts", tags=["Accounts"])
+app.include_router(users.router, prefix="/api/users", tags=["Users"])
 app.include_router(budgets.router, prefix="/api/budgets", tags=["Budgets"])
 app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
 app.include_router(files.router, prefix="/api/files", tags=["Files"])

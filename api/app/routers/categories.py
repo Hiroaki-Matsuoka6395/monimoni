@@ -1,5 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from sqlalchemy import select
 import logging
+
+from app.database import get_db
+from app.models import Category
 
 logger = logging.getLogger(__name__)
 
@@ -7,10 +12,27 @@ router = APIRouter()
 
 
 @router.get("/")
-async def get_categories():
+def get_categories(db: Session = Depends(get_db)):
     """Get all categories for the household."""
-    # TODO: Implement category retrieval
-    return {"categories": []}
+    try:
+        # 田中家のhousehold_id=1のカテゴリを取得
+        result = db.execute(select(Category).where(Category.household_id == 1, Category.is_active == True))
+        categories = result.scalars().all()
+
+        categories_data = []
+        for category in categories:
+            categories_data.append({
+                "id": category.id,
+                "name": category.name,
+                "parent_id": category.parent_id,
+                "is_active": category.is_active
+            })
+
+        return {"categories": categories_data}
+
+    except Exception as e:
+        logger.error(f"Error fetching categories: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.post("/")

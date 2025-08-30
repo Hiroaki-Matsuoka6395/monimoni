@@ -87,6 +87,11 @@ const Transactions: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(25)
   const [total, setTotal] = useState(0)
   
+  // マスターデータ
+  const [categories, setCategories] = useState<any[]>([])
+  const [accounts, setAccounts] = useState<any[]>([])
+  const [users, setUsers] = useState<any[]>([])
+  
   // フィルター状態
   const [filters, setFilters] = useState({
     from_date: '',
@@ -99,6 +104,7 @@ const Transactions: React.FC = () => {
   
   // ダイアログ状態
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [creating, setCreating] = useState(false)
   const [formData, setFormData] = useState<TransactionFormData>({
     date: new Date().toISOString().split('T')[0],
     type: 'expense',
@@ -135,6 +141,28 @@ const Transactions: React.FC = () => {
       setLoading(false)
     }
   }
+
+  // マスターデータを取得
+  const fetchMasterData = async () => {
+    try {
+      const [categoriesRes, accountsRes, usersRes] = await Promise.all([
+        api.categories.list(),
+        api.accounts.list(),
+        api.users.list()
+      ])
+      
+      setCategories(categoriesRes.data.categories)
+      setAccounts(accountsRes.data.accounts)
+      setUsers(usersRes.data.users)
+    } catch (err) {
+      console.error('Error fetching master data:', err)
+    }
+  }
+
+  // 初回読み込み時にマスターデータを取得
+  useEffect(() => {
+    fetchMasterData()
+  }, [])
 
   // 初回読み込みとフィルター変更時の再取得
   useEffect(() => {
@@ -204,6 +232,49 @@ const Transactions: React.FC = () => {
       link.remove()
     } catch (err) {
       console.error('Export failed:', err)
+    }
+  }
+
+  // 新規作成ハンドラー
+  const handleCreateTransaction = async () => {
+    try {
+      setCreating(true)
+      setError(null)
+
+      // バリデーション
+      if (!formData.date) {
+        setError('日付は必須です')
+        return
+      }
+      if (!formData.amount_total || formData.amount_total <= 0) {
+        setError('金額は0より大きい値を入力してください')
+        return
+      }
+
+      const response = await api.transactions.create(formData)
+      
+      if (response.status === 200) {
+        setCreateDialogOpen(false)
+        // フォームリセット
+        setFormData({
+          date: new Date().toISOString().split('T')[0],
+          type: 'expense',
+          amount_total: 0,
+          account_id: null,
+          category_id: null,
+          payer_user_id: null,
+          memo: '',
+          split_ratio_payer: 50,
+          items: []
+        })
+        // データ再取得
+        await fetchTransactions()
+      }
+    } catch (err: any) {
+      console.error('Error creating transaction:', err)
+      setError(err.response?.data?.detail || '取引の作成に失敗しました')
+    } finally {
+      setCreating(false)
     }
   }
 
@@ -422,6 +493,11 @@ const Transactions: React.FC = () => {
       >
         <DialogTitle>新しい取引を作成</DialogTitle>
         <DialogContent>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
           <Box sx={{ pt: 1 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
@@ -451,11 +527,63 @@ const Transactions: React.FC = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="金額"
-                  type="number"
                   fullWidth
-                  value={formData.amount_total}
-                  onChange={(e) => setFormData(prev => ({ ...prev, amount_total: Number(e.target.value) }))}
+                  value={formData.amount_total || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, amount_total: e.target.value ? Number(e.target.value) : 0 }))}
+                  inputProps={{ inputMode: 'decimal', pattern: '[0-9]*' }}
+                  helperText="手入力で金額を入力してください"
                 />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>カテゴリ</InputLabel>
+                  <Select
+                    value={formData.category_id || ''}
+                    label="カテゴリ"
+                    onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value ? Number(e.target.value) : null }))}
+                  >
+                    <MenuItem value="">選択なし</MenuItem>
+                    {categories.map((category) => (
+                      <MenuItem key={category.id} value={category.id}>
+                        {category.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>アカウント</InputLabel>
+                  <Select
+                    value={formData.account_id || ''}
+                    label="アカウント"
+                    onChange={(e) => setFormData(prev => ({ ...prev, account_id: e.target.value ? Number(e.target.value) : null }))}
+                  >
+                    <MenuItem value="">選択なし</MenuItem>
+                    {accounts.map((account) => (
+                      <MenuItem key={account.id} value={account.id}>
+                        {account.name} ({account.type})
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>支払者</InputLabel>
+                  <Select
+                    value={formData.payer_user_id || ''}
+                    label="支払者"
+                    onChange={(e) => setFormData(prev => ({ ...prev, payer_user_id: e.target.value ? Number(e.target.value) : null }))}
+                  >
+                    <MenuItem value="">選択なし</MenuItem>
+                    {users.map((user) => (
+                      <MenuItem key={user.id} value={user.id}>
+                        {user.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -485,8 +613,12 @@ const Transactions: React.FC = () => {
           <Button onClick={() => setCreateDialogOpen(false)}>
             キャンセル
           </Button>
-          <Button variant="contained" disabled>
-            作成（実装予定）
+          <Button 
+            variant="contained" 
+            onClick={handleCreateTransaction}
+            disabled={creating || !formData.amount_total}
+          >
+            {creating ? <CircularProgress size={20} /> : '作成'}
           </Button>
         </DialogActions>
       </Dialog>
