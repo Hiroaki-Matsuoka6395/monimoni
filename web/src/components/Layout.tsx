@@ -67,8 +67,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const drawer = (
     <Box>
       <Toolbar>
-        <Typography variant="h6" noWrap component="div">
-          MoneyMoni
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          monimoni
         </Typography>
       </Toolbar>
       <List>

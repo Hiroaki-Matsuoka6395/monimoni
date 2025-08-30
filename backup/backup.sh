@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# MySQL Backup Script for MoneyMoni
+# MySQL Backup Script for monimoni
 # Runs daily at 3:00 AM JST, keeps 7 generations
 
 BACKUP_DIR="/db_backups"

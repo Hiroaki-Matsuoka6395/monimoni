@@ -1,8 +1,8 @@
 .PHONY: help up down logs web api db migrate seed test fmt lint clean
 
 # Default target
-help:
-	@echo "MoneyMoni Development Commands"
+help:  ## Show this help message
+	@echo "monimoni Development Commands"
 	@echo "=============================="
 	@echo "up         - Start all services"
 	@echo "down       - Stop all services"

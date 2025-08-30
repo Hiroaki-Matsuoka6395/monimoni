@@ -17,11 +17,9 @@ logger = logging.getLogger(__name__)
 
 # Create FastAPI app
 app = FastAPI(
-    title="MoneyMoni Family Budget API",
-    description="API for household budgeting with split tracking",
-    version="0.1.0",
-    docs_url="/docs" if settings.DEBUG else None,
-    redoc_url="/redoc" if settings.DEBUG else None,
+    title="monimoni Family Budget API",
+    description="API for managing family budget and expenses",
+    version="1.0.0"
 )
 
 # Add security middleware
@@ -112,11 +110,11 @@ async def health_check():
 # Root endpoint
 
 
-@app.get("/", tags=["Root"])
+@app.get("/", response_model=dict)
 async def root():
-    """API root endpoint."""
+    """Root endpoint returning application information."""
     return {
-        "message": "MoneyMoni Family Budget API",
-        "version": "0.1.0",
-        "docs_url": "/docs" if settings.DEBUG else None
+        "message": "monimoni Family Budget API",
+        "version": "1.0.0",
+        "status": "active"
     }

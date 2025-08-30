@@ -81,9 +81,12 @@ const Login: React.FC = () => {
             <LockOutlined sx={{ color: 'white', fontSize: 32 }} />
           </Box>
           
-          <Typography component="h1" variant="h4" gutterBottom>
-            MoneyMoni
-          </Typography>
+                  <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: 'bold' }}>
+          🏠 家計簿アプリ
+        </Typography>
+        <Typography variant="h3" gutterBottom sx={{ mb: 4, fontWeight: 'bold', color: 'primary.main' }}>
+            monimoni
+        </Typography>
           
           <Typography variant="body1" color="text.secondary" gutterBottom>
             家計簿へようこそ

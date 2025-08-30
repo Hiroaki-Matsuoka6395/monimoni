@@ -1,4 +1,4 @@
-# MoneyMoni - Two-Person Household Budgeting App
+# monimoni - Two-Person Household Budgeting App
 
 A comprehensive full-stack budgeting application designed for couples to manage their finances with 50/50 split capabilities, receipt management, and CSV import/export.
 
@@ -259,4 +259,4 @@ For questions or issues:
 
 ---
 
-**MoneyMoni** - Making household budgeting simple and transparent for couples.
+**monimoni** - Making household budgeting simple and transparent for couples.

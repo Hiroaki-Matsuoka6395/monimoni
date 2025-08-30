@@ -1,253 +1,284 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoneyMoni - ログインテスト</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>monimoni - ログインテスト</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 40px; 
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 { 
-            text-align: center; 
-            color: #333; 
-            margin-bottom: 30px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input { 
-            width: 100%;
-            padding: 12px; 
-            border: 1px solid #ddd; 
-            border-radius: 5px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        button { 
-            width: 100%;
-            padding: 12px; 
-            background: #007bff; 
-            color: white; 
-            border: none; 
-            border-radius: 5px; 
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: monospace;
-            white-space: pre-wrap;
-        }
-        .success {
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-        }
-        .error {
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-        }
-        .dashboard-data {
-            margin-top: 20px;
-            background: #e9ecef;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        .transaction {
-            background: white;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            border-left: 4px solid #007bff;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        max-width: 400px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+      button {
+        width: 100%;
+        padding: 12px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      .result {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 5px;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+      .success {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+      .error {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+      }
+      .dashboard-data {
+        margin-top: 20px;
+        background: #e9ecef;
+        padding: 15px;
+        border-radius: 5px;
+      }
+      .transaction {
+        background: white;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 5px;
+        border-left: 4px solid #007bff;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>🏠 MoneyMoni ログイン</h1>
-        
-        <div class="form-group">
-            <label for="pin">家族PIN</label>
-            <input type="password" id="pin" placeholder="PINを入力 (1234)" value="1234">
-        </div>
-        
-        <button onclick="performLogin()" id="loginBtn">ログイン</button>
-        
-        <div id="result"></div>
-        
-        <div id="dashboard" style="display: none;">
-            <h3>📊 ダッシュボード</h3>
-            <button onclick="fetchDashboardData()">家計簿データを取得</button>
-            <div id="dashboardData"></div>
-        </div>
+      <h1>🏠 monimoni ログイン</h1>
+
+      <div class="form-group">
+        <label for="pin">家族PIN</label>
+        <input
+          type="password"
+          id="pin"
+          placeholder="PINを入力 (1234)"
+          value="1234"
+        />
+      </div>
+
+      <button onclick="performLogin()" id="loginBtn">ログイン</button>
+
+      <div id="result"></div>
+
+      <div id="dashboard" style="display: none">
+        <h3>📊 ダッシュボード</h3>
+        <button onclick="fetchDashboardData()">家計簿データを取得</button>
+        <div id="dashboardData"></div>
+      </div>
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:8000/api';
-        let authToken = null;
-        
-        async function performLogin() {
-            const pin = document.getElementById('pin').value;
-            const resultDiv = document.getElementById('result');
-            const loginBtn = document.getElementById('loginBtn');
-            
-            if (!pin) {
-                showResult('PINを入力してください', 'error');
-                return;
-            }
-            
-            loginBtn.disabled = true;
-            loginBtn.textContent = 'ログイン中...';
-            
-            try {
-                console.log('Attempting login...');
-                
-                const response = await fetch(`${API_BASE}/auth/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({ pin })
-                });
-                
-                console.log('Login response status:', response.status);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Login response data:', data);
-                    authToken = data.access_token;
-                    
-                    showResult('✅ ログイン成功！\n\nトークン: ' + data.access_token.substring(0, 50) + '...', 'success');
-                    
-                    // ダッシュボードボタンを表示
-                    document.getElementById('dashboard').style.display = 'block';
-                    
-                    // 認証状態を確認
-                    await checkAuthStatus();
-                    
-                } else {
-                    const error = await response.json();
-                    showResult('❌ ログイン失敗: ' + error.detail, 'error');
-                }
-            } catch (err) {
-                console.error('Login error:', err);
-                showResult('❌ ネットワークエラー: ' + err.message, 'error');
-            } finally {
-                loginBtn.disabled = false;
-                loginBtn.textContent = 'ログイン';
-            }
+      const API_BASE = "http://localhost:8000/api";
+      let authToken = null;
+
+      async function performLogin() {
+        const pin = document.getElementById("pin").value;
+        const resultDiv = document.getElementById("result");
+        const loginBtn = document.getElementById("loginBtn");
+
+        if (!pin) {
+          showResult("PINを入力してください", "error");
+          return;
         }
-        
-        async function checkAuthStatus() {
-            try {
-                console.log('Checking auth status...');
-                
-                const response = await fetch(`${API_BASE}/auth/me`, {
-                    credentials: 'include'
-                });
-                
-                console.log('Auth check response status:', response.status);
-                
-                if (response.ok) {
-                    const userData = await response.json();
-                    console.log('Auth check data:', userData);
-                    showResult('✅ 認証状態確認成功！\n\n' + JSON.stringify(userData, null, 2), 'success');
-                } else {
-                    const error = await response.json();
-                    showResult('❌ 認証確認失敗: ' + JSON.stringify(error, null, 2), 'error');
-                }
-            } catch (err) {
-                console.error('Auth check error:', err);
-                showResult('❌ 認証確認エラー: ' + err.message, 'error');
-            }
+
+        loginBtn.disabled = true;
+        loginBtn.textContent = "ログイン中...";
+
+        try {
+          console.log("Attempting login...");
+
+          const response = await fetch(`${API_BASE}/auth/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ pin }),
+          });
+
+          console.log("Login response status:", response.status);
+
+          if (response.ok) {
+            const data = await response.json();
+            console.log("Login response data:", data);
+            authToken = data.access_token;
+
+            showResult(
+              "✅ ログイン成功！\n\nトークン: " +
+                data.access_token.substring(0, 50) +
+                "...",
+              "success"
+            );
+
+            // ダッシュボードボタンを表示
+            document.getElementById("dashboard").style.display = "block";
+
+            // 認証状態を確認
+            await checkAuthStatus();
+          } else {
+            const error = await response.json();
+            showResult("❌ ログイン失敗: " + error.detail, "error");
+          }
+        } catch (err) {
+          console.error("Login error:", err);
+          showResult("❌ ネットワークエラー: " + err.message, "error");
+        } finally {
+          loginBtn.disabled = false;
+          loginBtn.textContent = "ログイン";
         }
-        
-        async function fetchDashboardData() {
-            const dashboardDiv = document.getElementById('dashboardData');
-            
-            try {
-                console.log('Fetching dashboard data...');
-                
-                const response = await fetch(`${API_BASE}/transactions/`, {
-                    credentials: 'include'
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Dashboard data:', data);
-                    
-                    let html = `<h4>💰 田中家の家計簿 (${data.total}件の取引)</h4>`;
-                    
-                    data.transactions.forEach(transaction => {
-                        const isIncome = transaction.type === 'income';
-                        const amount = isIncome ? transaction.amount_total : -transaction.amount_total;
-                        const amountText = (amount > 0 ? '+' : '') + '¥' + Math.abs(amount).toLocaleString();
-                        const typeText = isIncome ? '収入' : '支出';
-                        
-                        html += `
+      }
+
+      async function checkAuthStatus() {
+        try {
+          console.log("Checking auth status...");
+
+          const response = await fetch(`${API_BASE}/auth/me`, {
+            credentials: "include",
+          });
+
+          console.log("Auth check response status:", response.status);
+
+          if (response.ok) {
+            const userData = await response.json();
+            console.log("Auth check data:", userData);
+            showResult(
+              "✅ 認証状態確認成功！\n\n" + JSON.stringify(userData, null, 2),
+              "success"
+            );
+          } else {
+            const error = await response.json();
+            showResult(
+              "❌ 認証確認失敗: " + JSON.stringify(error, null, 2),
+              "error"
+            );
+          }
+        } catch (err) {
+          console.error("Auth check error:", err);
+          showResult("❌ 認証確認エラー: " + err.message, "error");
+        }
+      }
+
+      async function fetchDashboardData() {
+        const dashboardDiv = document.getElementById("dashboardData");
+
+        try {
+          console.log("Fetching dashboard data...");
+
+          const response = await fetch(`${API_BASE}/transactions/`, {
+            credentials: "include",
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            console.log("Dashboard data:", data);
+
+            let html = `<h4>💰 田中家の家計簿 (${data.total}件の取引)</h4>`;
+
+            data.transactions.forEach((transaction) => {
+              const isIncome = transaction.type === "income";
+              const amount = isIncome
+                ? transaction.amount_total
+                : -transaction.amount_total;
+              const amountText =
+                (amount > 0 ? "+" : "") +
+                "¥" +
+                Math.abs(amount).toLocaleString();
+              const typeText = isIncome ? "収入" : "支出";
+
+              html += `
                             <div class="transaction">
-                                <strong>${transaction.date}</strong> - ${typeText}: <strong>${amountText}</strong><br>
+                                <strong>${
+                                  transaction.date
+                                }</strong> - ${typeText}: <strong>${amountText}</strong><br>
                                 <small>
-                                    📂 ${transaction.category?.name || 'カテゴリなし'} | 
-                                    🏦 ${transaction.account?.name || 'アカウントなし'} | 
-                                    👤 ${transaction.payer_user?.name || 'ユーザーなし'}
+                                    📂 ${
+                                      transaction.category?.name ||
+                                      "カテゴリなし"
+                                    } | 
+                                    🏦 ${
+                                      transaction.account?.name ||
+                                      "アカウントなし"
+                                    } | 
+                                    👤 ${
+                                      transaction.payer_user?.name ||
+                                      "ユーザーなし"
+                                    }
                                 </small><br>
-                                <em>${transaction.memo || 'メモなし'}</em>
+                                <em>${transaction.memo || "メモなし"}</em>
                             </div>
                         `;
-                    });
-                    
-                    dashboardDiv.innerHTML = html;
-                } else {
-                    const error = await response.json();
-                    dashboardDiv.innerHTML = `<div class="error">❌ データ取得失敗: ${error.detail}</div>`;
-                }
-            } catch (err) {
-                console.error('Dashboard fetch error:', err);
-                dashboardDiv.innerHTML = `<div class="error">❌ エラー: ${err.message}</div>`;
-            }
+            });
+
+            dashboardDiv.innerHTML = html;
+          } else {
+            const error = await response.json();
+            dashboardDiv.innerHTML = `<div class="error">❌ データ取得失敗: ${error.detail}</div>`;
+          }
+        } catch (err) {
+          console.error("Dashboard fetch error:", err);
+          dashboardDiv.innerHTML = `<div class="error">❌ エラー: ${err.message}</div>`;
         }
-        
-        function showResult(message, type) {
-            const resultDiv = document.getElementById('result');
-            resultDiv.className = `result ${type}`;
-            resultDiv.textContent = message;
+      }
+
+      function showResult(message, type) {
+        const resultDiv = document.getElementById("result");
+        resultDiv.className = `result ${type}`;
+        resultDiv.textContent = message;
+      }
+
+      // Enter キーでログイン
+      document.getElementById("pin").addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          performLogin();
         }
-        
-        // Enter キーでログイン
-        document.getElementById('pin').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                performLogin();
-            }
-        });
+      });
     </script>
-</body>
+  </body>
 </html>

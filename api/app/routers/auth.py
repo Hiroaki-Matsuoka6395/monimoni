@@ -97,13 +97,13 @@ async def get_current_user(request: Request):
     """Get current authenticated user information."""
     # クッキーからトークンを取得
     token = request.cookies.get("access_token")
-    
+
     if not token:
         # Authorizationヘッダーからも確認
         auth_header = request.headers.get("authorization")
         if auth_header and auth_header.startswith("Bearer "):
             token = auth_header.split(" ")[1]
-    
+
     if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -156,4 +156,4 @@ The project foundation is solid and ready for rapid feature development. All ser
 - 📚 **API Docs**: http://localhost/api/docs
 - 🔍 **Health Check**: http://localhost/api/healthz
 
-The MoneyMoni household budgeting app is ready for its next development iteration! 🎉
+The monimoni household budgeting app is ready for its next development iteration! 🎉
