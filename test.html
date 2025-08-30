@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoneyMoni - Simple Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .transaction {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+      }
+      .login {
+        background: #f0f0f0;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 5px;
+      }
+      button {
+        padding: 10px 20px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      input {
+        padding: 10px;
+        margin: 5px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🏠 MoneyMoni - 家計簿テスト</h1>
+
+    <div class="login">
+      <h3>認証テスト</h3>
+      <input
+        type="password"
+        id="pinInput"
+        placeholder="PIN (1234)"
+        value="1234"
+      />
+      <button onclick="login()">ログイン</button>
+      <div id="loginResult"></div>
+    </div>
+
+    <div>
+      <h3>取引データ</h3>
+      <button onclick="fetchTransactions()">取引データを取得</button>
+      <div id="transactions"></div>
+    </div>
+
+    <script>
+      const API_BASE = "http://localhost:8000/api";
+
+      async function login() {
+        const pin = document.getElementById("pinInput").value;
+        const resultDiv = document.getElementById("loginResult");
+
+        try {
+          const response = await fetch(`${API_BASE}/auth/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ pin }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            resultDiv.innerHTML = `<p style="color: green;">✅ ログイン成功！</p>`;
+            resultDiv.innerHTML += `<pre>${JSON.stringify(
+              data,
+              null,
+              2
+            )}</pre>`;
+          } else {
+            const error = await response.json();
+            resultDiv.innerHTML = `<p style="color: red;">❌ ログイン失敗: ${error.detail}</p>`;
+          }
+        } catch (err) {
+          resultDiv.innerHTML = `<p style="color: red;">❌ エラー: ${err.message}</p>`;
+        }
+      }
+
+      async function fetchTransactions() {
+        const transactionsDiv = document.getElementById("transactions");
+
+        try {
+          const response = await fetch(`${API_BASE}/transactions/`, {
+            credentials: "include",
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            transactionsDiv.innerHTML = `<p style="color: green;">✅ 取引データ取得成功！総件数: ${data.total}</p>`;
+
+            data.transactions.forEach((transaction) => {
+              transactionsDiv.innerHTML += `
+                            <div class="transaction">
+                                <strong>${transaction.date}</strong> - 
+                                ${
+                                  transaction.type === "income"
+                                    ? "収入"
+                                    : "支出"
+                                }: 
+                                ¥${transaction.amount_total.toLocaleString()}<br>
+                                <small>
+                                    ${
+                                      transaction.category?.name ||
+                                      "カテゴリなし"
+                                    } | 
+                                    ${
+                                      transaction.account?.name ||
+                                      "アカウントなし"
+                                    } | 
+                                    ${
+                                      transaction.payer_user?.name ||
+                                      "ユーザーなし"
+                                    }
+                                </small><br>
+                                <em>${transaction.memo || "メモなし"}</em>
+                            </div>
+                        `;
+            });
+          } else {
+            const error = await response.json();
+            transactionsDiv.innerHTML = `<p style="color: red;">❌ 取得失敗: ${error.detail}</p>`;
+          }
+        } catch (err) {
+          transactionsDiv.innerHTML = `<p style="color: red;">❌ エラー: ${err.message}</p>`;
+        }
+      }
+    </script>
+  </body>
+</html>

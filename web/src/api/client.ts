@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // Create axios instance with default config
 export const apiClient = axios.create({
-  baseURL: '/api',
+  baseURL: 'http://localhost:8000/api',
   timeout: 10000,
   withCredentials: true, // Include cookies for authentication
   headers: {
