@@ -9,11 +9,17 @@ interface User {
 }
 
 export const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    // ローカルストレージから認証状態を復元
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('isAuthenticated') === 'true'
+    }
+    return false
+  })
+  const [isLoading, setIsLoading] = useState(false)
   const queryClient = useQueryClient()
 
-  // Check authentication status - 初期状態では無効化
+  // Check authentication status - 完全に無効化
   const { data: user, error, isLoading: queryLoading, refetch } = useQuery({
     queryKey: ['auth', 'me'],
     queryFn: async () => {
@@ -28,9 +34,16 @@ export const useAuth = () => {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchInterval: false,
-    enabled: false, // 初期状態では無効化してループを防ぐ
+    enabled: false, // 完全に無効化
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
+
+  // 認証状態をローカルストレージに保存
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('isAuthenticated', isAuthenticated.toString())
+    }
+  }, [isAuthenticated])
 
   useEffect(() => {
     if (user?.authenticated) {
@@ -44,11 +57,18 @@ export const useAuth = () => {
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: async (pin: string) => {
+      console.log('Attempting login with PIN:', pin)
       const response = await apiClient.post('/auth/login', { pin })
+      console.log('Login response:', response.data)
       return response.data
     },
-    onSuccess: () => {
-      // ログイン成功後にユーザー情報を取得
+    onSuccess: (data) => {
+      console.log('Login successful, updating auth state')
+      // ログイン成功時に即座に認証状態を更新
+      setIsAuthenticated(true)
+      setIsLoading(false)
+      // ユーザー情報も取得
+      console.log('Fetching user info after login')
       refetch()
     },
     onError: (error: any) => {
@@ -65,11 +85,35 @@ export const useAuth = () => {
     onSuccess: () => {
       queryClient.clear()
       setIsAuthenticated(false)
+      // ローカルストレージもクリア
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('isAuthenticated')
+      }
     },
   })
 
-  const login = (pin: string) => {
-    return loginMutation.mutateAsync(pin)
+  const login = async (pin: string) => {
+    try {
+      console.log('useAuth: Starting login...')
+      const result = await loginMutation.mutateAsync(pin)
+      console.log('useAuth: Login mutation completed')
+      
+      // 確実に認証状態を更新
+      setIsAuthenticated(true)
+      setIsLoading(false)
+      
+      // ローカルストレージにも保存
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('isAuthenticated', 'true')
+      }
+      
+      console.log('useAuth: Auth state updated to true')
+      return result
+    } catch (error) {
+      console.error('useAuth: Login failed', error)
+      setIsAuthenticated(false)
+      throw error
+    }
   }
 
   const logout = () => {

@@ -30,9 +30,22 @@ const Login: React.FC = () => {
     }
 
     try {
+      console.log('Attempting login...')
       await login(pin)
-      navigate('/')
+      console.log('Login successful, navigating to dashboard...')
+      
+      // 確実にダッシュボードに遷移するため、複数の方法を試す
+      
+      // 方法1: window.locationで直接遷移
+      window.location.href = '/'
+      
+      // 方法2: React Routerでの遷移（バックアップ）
+      setTimeout(() => {
+        navigate('/', { replace: true })
+      }, 100)
+      
     } catch (err: any) {
+      console.error('Login failed:', err)
       setError(err?.response?.data?.detail || 'ログインに失敗しました')
     }
   }

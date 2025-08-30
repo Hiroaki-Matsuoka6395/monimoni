@@ -24,20 +24,22 @@ const LoadingSpinner = () => (
 )
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  // 一時的に認証を無効化
+  const { isAuthenticated, isLoading } = useAuth()
+  
+  console.log('ProtectedRoute - isAuthenticated:', isAuthenticated, 'isLoading:', isLoading)
+  
+  if (isLoading) {
+    console.log('ProtectedRoute - showing loading spinner')
+    return <LoadingSpinner />
+  }
+  
+  if (!isAuthenticated) {
+    console.log('ProtectedRoute - not authenticated, redirecting to login')
+    return <Navigate to="/login" replace />
+  }
+  
+  console.log('ProtectedRoute - authenticated, showing protected content')
   return <>{children}</>
-  
-  // const { isAuthenticated, isLoading } = useAuth()
-  
-  // if (isLoading) {
-  //   return <LoadingSpinner />
-  // }
-  
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/login" replace />
-  // }
-  
-  // return <>{children}</>
 }
 
 function App() {
