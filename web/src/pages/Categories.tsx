@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -23,16 +23,24 @@ import {
   FormControl,
   InputLabel,
   Alert,
-  Chip
-} from '@mui/material';
-import { Edit as EditIcon, Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { apiClient } from '../api/client';
+  Chip,
+} from "@mui/material";
+import {
+  Edit as EditIcon,
+  Add as AddIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
+import { apiClient } from "../api/client";
 
 interface Category {
   id: number;
   name: string;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   household_id: number;
+}
+
+interface ChangeEvent {
+  target: { value: string };
 }
 
 const Categories: React.FC = () => {
@@ -41,8 +49,10 @@ const Categories: React.FC = () => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCreateMode, setIsCreateMode] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertSeverity, setAlertSeverity] = useState<'success' | 'error'>('success');
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
+    "success"
+  );
 
   useEffect(() => {
     fetchCategories();
@@ -50,12 +60,12 @@ const Categories: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await apiClient.get('/categories/');
+      const response = await apiClient.get("/categories/");
       setCategories(response.data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
-      setAlertMessage('カテゴリデータの取得に失敗しました');
-      setAlertSeverity('error');
+      console.error("Error fetching categories:", error);
+      setAlertMessage("カテゴリデータの取得に失敗しました");
+      setAlertSeverity("error");
     } finally {
       setLoading(false);
     }
@@ -70,9 +80,9 @@ const Categories: React.FC = () => {
   const handleCreate = () => {
     setEditingCategory({
       id: 0,
-      name: '',
-      type: 'expense',
-      household_id: 1
+      name: "",
+      type: "expense",
+      household_id: 1,
     });
     setIsCreateMode(true);
     setIsDialogOpen(true);
@@ -83,27 +93,27 @@ const Categories: React.FC = () => {
 
     try {
       if (isCreateMode) {
-        await apiClient.post('/categories/', {
+        await apiClient.post("/categories/", {
           name: editingCategory.name.trim(),
           type: editingCategory.type,
-          household_id: 1
+          household_id: 1,
         });
-        setAlertMessage('カテゴリを作成しました');
+        setAlertMessage("カテゴリを作成しました");
       } else {
         await apiClient.put(`/categories/${editingCategory.id}`, {
           name: editingCategory.name.trim(),
-          type: editingCategory.type
+          type: editingCategory.type,
         });
-        setAlertMessage('カテゴリを更新しました');
+        setAlertMessage("カテゴリを更新しました");
       }
-      
-      setAlertSeverity('success');
+
+      setAlertSeverity("success");
       setIsDialogOpen(false);
       fetchCategories();
     } catch (error) {
-      console.error('Error saving category:', error);
-      setAlertMessage('カテゴリの保存に失敗しました');
-      setAlertSeverity('error');
+      console.error("Error saving category:", error);
+      setAlertMessage("カテゴリの保存に失敗しました");
+      setAlertSeverity("error");
     }
   };
 
@@ -114,22 +124,22 @@ const Categories: React.FC = () => {
 
     try {
       await apiClient.delete(`/categories/${categoryId}`);
-      setAlertMessage('カテゴリを削除しました');
-      setAlertSeverity('success');
+      setAlertMessage("カテゴリを削除しました");
+      setAlertSeverity("success");
       fetchCategories();
     } catch (error) {
-      console.error('Error deleting category:', error);
-      setAlertMessage('カテゴリの削除に失敗しました');
-      setAlertSeverity('error');
+      console.error("Error deleting category:", error);
+      setAlertMessage("カテゴリの削除に失敗しました");
+      setAlertSeverity("error");
     }
   };
 
   const getTypeChipColor = (type: string) => {
-    return type === 'income' ? 'success' : 'error';
+    return type === "income" ? "success" : "error";
   };
 
   const getTypeLabel = (type: string) => {
-    return type === 'income' ? '収入' : '支出';
+    return type === "income" ? "収入" : "支出";
   };
 
   if (loading) {
@@ -143,12 +153,21 @@ const Categories: React.FC = () => {
   return (
     <Box p={3}>
       {alertMessage && (
-        <Alert severity={alertSeverity} onClose={() => setAlertMessage('')} sx={{ mb: 2 }}>
+        <Alert
+          severity={alertSeverity}
+          onClose={() => setAlertMessage("")}
+          sx={{ mb: 2 }}
+        >
           {alertMessage}
         </Alert>
       )}
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h4" component="h1">
           カテゴリ管理
         </Typography>
@@ -191,11 +210,16 @@ const Categories: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell align="center">
-                        <IconButton onClick={() => handleEdit(category)} size="small">
+                        <IconButton
+                          onClick={() => handleEdit(category)}
+                          size="small"
+                        >
                           <EditIcon />
                         </IconButton>
-                        <IconButton 
-                          onClick={() => handleDelete(category.id, category.name)} 
+                        <IconButton
+                          onClick={() =>
+                            handleDelete(category.id, category.name)
+                          }
                           size="small"
                           color="error"
                         >
@@ -212,19 +236,30 @@ const Categories: React.FC = () => {
       </Card>
 
       {/* 編集・作成ダイアログ */}
-      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>
-          {isCreateMode ? 'カテゴリ作成' : 'カテゴリ編集'}
+          {isCreateMode ? "カテゴリ作成" : "カテゴリ編集"}
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Box sx={{ pt: 1, display: "flex", flexDirection: "column", gap: 3 }}>
             <TextField
               label="カテゴリ名"
-              value={editingCategory?.name || ''}
-              onChange={(e) => setEditingCategory(prev => prev ? {
-                ...prev,
-                name: e.target.value
-              } : null)}
+              value={editingCategory?.name || ""}
+              onChange={(e: ChangeEvent) =>
+                setEditingCategory((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        name: e.target.value,
+                      }
+                    : null
+                )
+              }
               fullWidth
               required
             />
@@ -232,11 +267,17 @@ const Categories: React.FC = () => {
             <FormControl fullWidth>
               <InputLabel>種別</InputLabel>
               <Select
-                value={editingCategory?.type || 'expense'}
-                onChange={(e) => setEditingCategory(prev => prev ? {
-                  ...prev,
-                  type: e.target.value as 'income' | 'expense'
-                } : null)}
+                value={editingCategory?.type || "expense"}
+                onChange={(e: ChangeEvent) =>
+                  setEditingCategory((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          type: e.target.value as "income" | "expense",
+                        }
+                      : null
+                  )
+                }
               >
                 <MenuItem value="income">収入</MenuItem>
                 <MenuItem value="expense">支出</MenuItem>
@@ -245,20 +286,18 @@ const Categories: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsDialogOpen(false)}>
-            キャンセル
-          </Button>
-          <Button 
-            onClick={handleSave} 
+          <Button onClick={() => setIsDialogOpen(false)}>キャンセル</Button>
+          <Button
+            onClick={handleSave}
             variant="contained"
             disabled={!editingCategory?.name?.trim()}
           >
-            {isCreateMode ? '作成' : '更新'}
+            {isCreateMode ? "作成" : "更新"}
           </Button>
         </DialogActions>
       </Dialog>
     </Box>
   );
-}
+};
 
-export default Categories
+export default Categories;

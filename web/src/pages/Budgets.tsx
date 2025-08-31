@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -24,14 +24,14 @@ import {
   FormControl,
   InputLabel,
   Alert,
-  Chip
-} from '@mui/material';
-import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { ja } from 'date-fns/locale';
-import { formatNumber } from '../utils/formatNumber';
-import { apiClient } from '../api/client';
+  Chip,
+} from "@mui/material";
+import { Edit as EditIcon, Add as AddIcon } from "@mui/icons-material";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { ja } from "date-fns/locale";
+import { formatNumber } from "../utils/formatNumber";
+import { apiClient } from "../api/client";
 
 interface Budget {
   id: number;
@@ -50,6 +50,10 @@ interface Category {
   type: string;
 }
 
+interface ChangeEvent {
+  target: { value: string };
+}
+
 const Budgets: React.FC = () => {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -58,10 +62,15 @@ const Budgets: React.FC = () => {
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCreateMode, setIsCreateMode] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertSeverity, setAlertSeverity] = useState<'success' | 'error'>('success');
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
+    "success"
+  );
 
-  const monthString = selectedMonth.toISOString().substring(0, 7).replace('-', '');
+  const monthString = selectedMonth
+    .toISOString()
+    .substring(0, 7)
+    .replace("-", "");
 
   useEffect(() => {
     fetchBudgets();
@@ -73,9 +82,9 @@ const Budgets: React.FC = () => {
       const response = await apiClient.get(`/budgets/?month=${monthString}`);
       setBudgets(response.data.budgets);
     } catch (error) {
-      console.error('Error fetching budgets:', error);
-      setAlertMessage('予算データの取得に失敗しました');
-      setAlertSeverity('error');
+      console.error("Error fetching budgets:", error);
+      setAlertMessage("予算データの取得に失敗しました");
+      setAlertSeverity("error");
     } finally {
       setLoading(false);
     }
@@ -83,11 +92,13 @@ const Budgets: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await apiClient.get('/categories/');
+      const response = await apiClient.get("/categories/");
       // 支出カテゴリのみフィルター
-      setCategories(response.data.filter((cat: Category) => cat.type === 'expense'));
+      setCategories(
+        response.data.filter((cat: Category) => cat.type === "expense")
+      );
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -101,12 +112,12 @@ const Budgets: React.FC = () => {
     setEditingBudget({
       id: 0,
       category_id: 0,
-      category_name: '',
+      category_name: "",
       amount_limit: 0,
       amount_spent: 0,
       amount_remaining: 0,
       percentage: 0,
-      month: monthString
+      month: monthString,
     });
     setIsCreateMode(true);
     setIsDialogOpen(true);
@@ -117,41 +128,43 @@ const Budgets: React.FC = () => {
 
     try {
       if (isCreateMode) {
-        await apiClient.post('/budgets/', {
+        await apiClient.post("/budgets/", {
           category_id: editingBudget.category_id,
           amount_limit: editingBudget.amount_limit,
-          month: monthString
+          month: monthString,
         });
-        setAlertMessage('予算を作成しました');
+        setAlertMessage("予算を作成しました");
       } else {
-        await apiClient.put('/budgets/', [{
-          category_id: editingBudget.category_id,
-          amount_limit: editingBudget.amount_limit,
-          month: monthString
-        }]);
-        setAlertMessage('予算を更新しました');
+        await apiClient.put("/budgets/", [
+          {
+            category_id: editingBudget.category_id,
+            amount_limit: editingBudget.amount_limit,
+            month: monthString,
+          },
+        ]);
+        setAlertMessage("予算を更新しました");
       }
-      
-      setAlertSeverity('success');
+
+      setAlertSeverity("success");
       setIsDialogOpen(false);
       fetchBudgets();
     } catch (error) {
-      console.error('Error saving budget:', error);
-      setAlertMessage('予算の保存に失敗しました');
-      setAlertSeverity('error');
+      console.error("Error saving budget:", error);
+      setAlertMessage("予算の保存に失敗しました");
+      setAlertSeverity("error");
     }
   };
 
   const getProgressColor = (percentage: number) => {
-    if (percentage <= 50) return 'success';
-    if (percentage <= 80) return 'warning';
-    return 'error';
+    if (percentage <= 50) return "success";
+    if (percentage <= 80) return "warning";
+    return "error";
   };
 
   const getRemainingChipColor = (remaining: number) => {
-    if (remaining > 0) return 'success';
-    if (remaining === 0) return 'warning';
-    return 'error';
+    if (remaining > 0) return "success";
+    if (remaining === 0) return "warning";
+    return "error";
   };
 
   if (loading) {
@@ -165,12 +178,21 @@ const Budgets: React.FC = () => {
   return (
     <Box p={3}>
       {alertMessage && (
-        <Alert severity={alertSeverity} onClose={() => setAlertMessage('')} sx={{ mb: 2 }}>
+        <Alert
+          severity={alertSeverity}
+          onClose={() => setAlertMessage("")}
+          sx={{ mb: 2 }}
+        >
           {alertMessage}
         </Alert>
       )}
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h4" component="h1">
           予算管理
         </Typography>
@@ -179,10 +201,12 @@ const Budgets: React.FC = () => {
             <DatePicker
               label="対象月"
               value={selectedMonth}
-              onChange={(newValue) => newValue && setSelectedMonth(newValue)}
-              views={['year', 'month']}
+              onChange={(newValue: any) =>
+                newValue && setSelectedMonth(newValue)
+              }
+              views={["year", "month"]}
               format="yyyy年MM月"
-              slotProps={{ textField: { size: 'small' } }}
+              slotProps={{ textField: { size: "small" } }}
             />
           </LocalizationProvider>
           <Button
@@ -234,9 +258,7 @@ const Budgets: React.FC = () => {
                           size="small"
                         />
                       </TableCell>
-                      <TableCell align="center">
-                        {budget.percentage}%
-                      </TableCell>
+                      <TableCell align="center">{budget.percentage}%</TableCell>
                       <TableCell align="center" sx={{ minWidth: 150 }}>
                         <LinearProgress
                           variant="determinate"
@@ -246,7 +268,10 @@ const Budgets: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell align="center">
-                        <IconButton onClick={() => handleEdit(budget)} size="small">
+                        <IconButton
+                          onClick={() => handleEdit(budget)}
+                          size="small"
+                        >
                           <EditIcon />
                         </IconButton>
                       </TableCell>
@@ -260,24 +285,33 @@ const Budgets: React.FC = () => {
       </Card>
 
       {/* 編集・作成ダイアログ */}
-      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {isCreateMode ? '予算作成' : '予算編集'}
-        </DialogTitle>
+      <Dialog
+        open={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>{isCreateMode ? "予算作成" : "予算編集"}</DialogTitle>
         <DialogContent>
-          <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Box sx={{ pt: 1, display: "flex", flexDirection: "column", gap: 3 }}>
             <FormControl fullWidth>
               <InputLabel>カテゴリ</InputLabel>
               <Select
-                value={editingBudget?.category_id || ''}
-                onChange={(e) => {
+                value={editingBudget?.category_id?.toString() || ""}
+                onChange={(e: ChangeEvent) => {
                   const categoryId = Number(e.target.value);
-                  const category = categories.find(cat => cat.id === categoryId);
-                  setEditingBudget(prev => prev ? {
-                    ...prev,
-                    category_id: categoryId,
-                    category_name: category?.name || ''
-                  } : null);
+                  const category = categories.find(
+                    (cat: Category) => cat.id === categoryId
+                  );
+                  setEditingBudget((prev: Budget | null) =>
+                    prev
+                      ? {
+                          ...prev,
+                          category_id: categoryId,
+                          category_name: category?.name || "",
+                        }
+                      : null
+                  );
                 }}
                 disabled={!isCreateMode}
               >
@@ -292,33 +326,43 @@ const Budgets: React.FC = () => {
             <TextField
               label="予算額"
               type="number"
-              value={editingBudget?.amount_limit || ''}
-              onChange={(e) => setEditingBudget(prev => prev ? {
-                ...prev,
-                amount_limit: Number(e.target.value)
-              } : null)}
+              value={editingBudget?.amount_limit || ""}
+              onChange={(e: ChangeEvent) =>
+                setEditingBudget((prev: Budget | null) =>
+                  prev
+                    ? {
+                        ...prev,
+                        amount_limit: Number(e.target.value),
+                      }
+                    : null
+                )
+              }
               fullWidth
               InputProps={{
-                startAdornment: <Typography variant="body2" sx={{ mr: 1 }}>¥</Typography>
+                startAdornment: (
+                  <Typography variant="body2" sx={{ mr: 1 }}>
+                    ¥
+                  </Typography>
+                ),
               }}
             />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsDialogOpen(false)}>
-            キャンセル
-          </Button>
-          <Button 
-            onClick={handleSave} 
+          <Button onClick={() => setIsDialogOpen(false)}>キャンセル</Button>
+          <Button
+            onClick={handleSave}
             variant="contained"
-            disabled={!editingBudget?.category_id || !editingBudget?.amount_limit}
+            disabled={
+              !editingBudget?.category_id || !editingBudget?.amount_limit
+            }
           >
-            {isCreateMode ? '作成' : '更新'}
+            {isCreateMode ? "作成" : "更新"}
           </Button>
         </DialogActions>
       </Dialog>
     </Box>
   );
-}
+};
 
-export default Budgets
+export default Budgets;
