@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session, selectinload
-from sqlalchemy import select, func, and_, or_
-from typing import List, Optional
-from datetime import datetime, date
+from sqlalchemy.orm import Session
+from sqlalchemy import select, func
+from typing import Optional
+from datetime import datetime
 import logging
 
 from app.database import get_db
 from app.models import Transaction, Category, Account, User, TransactionItem
-from app.schemas import TransactionResponse, TransactionCreate
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +61,7 @@ def get_transactions(
         query = query.order_by(Transaction.date.desc(), Transaction.created_at.desc())
 
         # 総件数を取得
-        count_query = select(func.count()).select_from(query.subquery())
+        count_query = select(func.count('*')).select_from(query.subquery())
         total = db.execute(count_query).scalar()
 
         # ページネーション
@@ -125,7 +124,7 @@ def get_transactions(
         }
 
     except Exception as e:
-        logger.error(f"Error fetching transactions: {str(e)}")
+        logger.error("Error fetching transactions: %s", str(e))
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
@@ -214,7 +213,7 @@ def create_transaction(transaction_data: dict, db: Session = Depends(get_db)):
         raise
     except Exception as e:
         db.rollback()
-        logger.error(f"Error creating transaction: {str(e)}")
+        logger.error("Error creating transaction: %s", str(e))
         raise HTTPException(status_code=500, detail="Internal server error")
 
 

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional
-from datetime import date, datetime
+from datetime import date as date_type, datetime
 from decimal import Decimal
 from enum import Enum
 
@@ -56,7 +56,7 @@ class TransactionItemBase(BaseModel):
 
 
 class TransactionBase(BaseModel):
-    date: date
+    date: date_type
     type: TransactionType
     amount_total: Decimal = Field(gt=0)
     account_id: int
@@ -105,7 +105,7 @@ class TransactionCreate(TransactionBase):
     tags: List[str] = []
 
     @validator('items')
-    def validate_items_total(cls, v, values):
+    def validate_items_total(cls, v, values, **_):
         if 'amount_total' in values and v:
             items_total = sum(item.amount for item in v)
             if abs(items_total - values['amount_total']) > Decimal('0.01'):
@@ -192,7 +192,7 @@ class BudgetResponse(BudgetBase):
 
 
 class TransactionUpdate(BaseModel):
-    date: Optional[date] = None
+    date: Optional[date_type] = None
     type: Optional[TransactionType] = None
     amount_total: Optional[Decimal] = Field(None, gt=0)
     account_id: Optional[int] = None
@@ -231,8 +231,8 @@ class MonthlyReportResponse(BaseModel):
 
 
 class SplitReportResponse(BaseModel):
-    from_date: Optional[date]
-    to_date: Optional[date]
+    from_date: Optional[date_type]
+    to_date: Optional[date_type]
     users: List[dict]
     total_expenses: Decimal
 

@@ -70,7 +70,7 @@ def get_budgets(
         return {"budgets": budgets, "month": month}
 
     except Exception as e:
-        logger.error(f"Error fetching budgets: {str(e)}")
+        logger.error("Error fetching budgets: %s", str(e))
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
@@ -111,7 +111,7 @@ def update_budgets(budget_data: list, db: Session = Depends(get_db)):
 
     except Exception as e:
         db.rollback()
-        logger.error(f"Error updating budgets: {str(e)}")
+        logger.error("Error updating budgets: %s", str(e))
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
@@ -158,5 +158,5 @@ def create_budget(budget_data: dict, db: Session = Depends(get_db)):
         raise
     except Exception as e:
         db.rollback()
-        logger.error(f"Error creating budget: {str(e)}")
+        logger.error("Error creating budget: %s", str(e))
         raise HTTPException(status_code=500, detail="Internal server error")

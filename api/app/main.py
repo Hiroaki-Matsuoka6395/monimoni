@@ -47,9 +47,8 @@ async def log_requests(request: Request, call_next):
     process_time = time.time() - start_time
 
     logger.info(
-        f"{request.method} {request.url.path} - "
-        f"Status: {response.status_code} - "
-        f"Time: {process_time:.4f}s"
+        "%s %s - Status: %s - Time: %.4fs",
+        request.method, request.url.path, response.status_code, process_time
     )
     return response
 
@@ -57,7 +56,7 @@ async def log_requests(request: Request, call_next):
 
 
 @app.exception_handler(404)
-async def not_found_handler(request: Request, exc):
+async def not_found_handler(_request: Request, _exc):
     return JSONResponse(
         status_code=404,
         content={"detail": "Resource not found"}
@@ -65,8 +64,8 @@ async def not_found_handler(request: Request, exc):
 
 
 @app.exception_handler(500)
-async def internal_error_handler(request: Request, exc):
-    logger.error(f"Internal server error: {exc}")
+async def internal_error_handler(_request: Request, exc):
+    logger.error("Internal server error: %s", exc)
     return JSONResponse(
         status_code=500,
         content={"detail": "Internal server error"}
@@ -90,15 +89,14 @@ app.include_router(files.router, prefix="/api/files", tags=["Files"])
 async def health_check():
     """Health check endpoint for load balancers and monitoring."""
     try:
-        # TODO: Add database connectivity check
-        # TODO: Add file system write check
+        # Basic health check - can be extended with database connectivity
         return {
             "status": "healthy",
             "timestamp": time.time(),
             "version": "0.1.0"
         }
-    except Exception as e:
-        logger.error(f"Health check failed: {e}")
+    except ConnectionError as e:
+        logger.error("Health check failed: %s", e)
         return JSONResponse(
             status_code=503,
             content={

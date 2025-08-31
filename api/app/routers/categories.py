@@ -42,7 +42,7 @@ def get_categories(db: Session = Depends(get_db)):
 
         return categories_data
     except Exception as e:
-        logger.error(f"Error fetching categories: {str(e)}")
+        logger.error("Error fetching categories: %s", str(e))
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
@@ -68,7 +68,7 @@ def create_category(category_data: CategoryCreate, db: Session = Depends(get_db)
         }
     except Exception as e:
         db.rollback()
-        logger.error(f"Error creating category: {str(e)}")
+        logger.error("Error creating category: %s", str(e))
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
@@ -96,7 +96,7 @@ def update_category(category_id: int, category_data: CategoryUpdate, db: Session
         raise
     except Exception as e:
         db.rollback()
-        logger.error(f"Error updating category: {str(e)}")
+        logger.error("Error updating category: %s", str(e))
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
@@ -119,32 +119,5 @@ def delete_category(category_id: int, db: Session = Depends(get_db)):
         raise
     except Exception as e:
         db.rollback()
-        logger.error(f"Error deleting category: {str(e)}")
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-        return {"categories": categories_data}
-
-    except Exception as e:
-        logger.error(f"Error fetching categories: {str(e)}")
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-
-@router.post("/")
-async def create_category(category_data: dict):
-    """Create a new category."""
-    # TODO: Implement category creation
-    return {"message": "Category created", "id": 1}
-
-
-@router.put("/{category_id}")
-async def update_category(category_id: int, category_data: dict):
-    """Update existing category."""
-    # TODO: Implement category update
-    return {"message": f"Category {category_id} updated"}
-
-
-@router.delete("/{category_id}")
-async def delete_category(category_id: int):
-    """Delete category if not in use."""
-    # TODO: Implement category deletion with usage check
-    return {"message": f"Category {category_id} deleted"}
+        logger.error("Error deleting category: %s", str(e))
+        raise HTTPException(status_code=500, detail="Internal server error") from e
