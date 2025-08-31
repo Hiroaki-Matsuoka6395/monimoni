@@ -49,12 +49,12 @@ export const api = {
   // Transactions
   transactions: {
     list: (params?: Record<string, any>) => 
-      apiClient.get('/transactions', { params }),
-    create: (data: any) => apiClient.post('/transactions', data),
-    get: (id: number) => apiClient.get(`/transactions/${id}`),
+      apiClient.get('/transactions/', { params }),
+    create: (data: any) => apiClient.post('/transactions/', data),
+    get: (id: number) => apiClient.get(`/transactions/${id}/`),
     update: (id: number, data: any) => 
-      apiClient.put(`/transactions/${id}`, data),
-    delete: (id: number) => apiClient.delete(`/transactions/${id}`),
+      apiClient.put(`/transactions/${id}/`, data),
+    delete: (id: number) => apiClient.delete(`/transactions/${id}/`),
     uploadReceipt: (id: number, file: File) => {
       const formData = new FormData()
       formData.append('file', file)
@@ -66,37 +66,37 @@ export const api = {
 
   // Categories
   categories: {
-    list: () => apiClient.get('/categories'),
-    create: (data: any) => apiClient.post('/categories', data),
+    list: () => apiClient.get('/categories/'),
+    create: (data: any) => apiClient.post('/categories/', data),
     update: (id: number, data: any) => 
-      apiClient.put(`/categories/${id}`, data),
-    delete: (id: number) => apiClient.delete(`/categories/${id}`),
+      apiClient.put(`/categories/${id}/`, data),
+    delete: (id: number) => apiClient.delete(`/categories/${id}/`),
   },
 
   // Accounts
   accounts: {
-    list: () => apiClient.get('/accounts'),
-    create: (data: any) => apiClient.post('/accounts', data),
+    list: () => apiClient.get('/accounts/'),
+    create: (data: any) => apiClient.post('/accounts/', data),
     update: (id: number, data: any) => 
-      apiClient.put(`/accounts/${id}`, data),
-    delete: (id: number) => apiClient.delete(`/accounts/${id}`),
+      apiClient.put(`/accounts/${id}/`, data),
+    delete: (id: number) => apiClient.delete(`/accounts/${id}/`),
   },
 
   // Budgets
   budgets: {
     list: (month?: string) => 
-      apiClient.get('/budgets', { params: { month } }),
-    update: (data: any[]) => apiClient.put('/budgets', data),
+      apiClient.get('/budgets/', { params: { month } }),
+    update: (data: any[]) => apiClient.put('/budgets/', data),
   },
 
   // Reports
   reports: {
     monthly: (month?: string) => 
-      apiClient.get('/reports/monthly', { params: { month } }),
+      apiClient.get('/reports/monthly/', { params: { month } }),
     trend: (params?: Record<string, any>) => 
-      apiClient.get('/reports/trend', { params }),
+      apiClient.get('/reports/trend/', { params }),
     split: (params?: Record<string, any>) => 
-      apiClient.get('/reports/split', { params }),
+      apiClient.get('/reports/split/', { params }),
   },
 
   // Files
@@ -125,13 +125,13 @@ export const api = {
 
   // Users
   users: {
-    list: () => apiClient.get('/users'),
-    create: (data: any) => apiClient.post('/users', data),
+    list: () => apiClient.get('/users/'),
+    create: (data: any) => apiClient.post('/users/', data),
     update: (id: number, data: any) => 
-      apiClient.put(`/users/${id}`, data),
-    delete: (id: number) => apiClient.delete(`/users/${id}`),
+      apiClient.put(`/users/${id}/`, data),
+    delete: (id: number) => apiClient.delete(`/users/${id}/`),
   },
 
   // Health check
-  health: () => apiClient.get('/healthz'),
+  health: () => apiClient.get('/healthz/'),
 }

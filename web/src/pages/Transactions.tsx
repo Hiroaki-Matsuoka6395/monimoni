@@ -177,9 +177,10 @@ const Transactions: React.FC = () => {
         api.users.list(),
       ]);
 
-      setCategories(categoriesRes.data.categories);
-      setAccounts(accountsRes.data.accounts);
-      setUsers(usersRes.data.users);
+      // APIレスポンスの構造に合わせてデータを設定
+      setCategories(categoriesRes.data); // 配列として直接返される
+      setAccounts(accountsRes.data); // 配列として直接返される
+      setUsers(usersRes.data.users); // {users: [...]} 形式
     } catch (err) {
       console.error("Error fetching master data:", err);
     }
