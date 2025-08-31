@@ -210,7 +210,7 @@ const Dashboard: React.FC = () => {
       <Box display="flex" justifyContent="space-between" mb={1}>
         <Typography variant="body2">{category}</Typography>
         <Typography variant="body2" color="textSecondary">
-          ¥{spent.toLocaleString()} / ¥{limit.toLocaleString()}
+          ¥{(spent || 0).toLocaleString()} / ¥{(limit || 0).toLocaleString()}
         </Typography>
       </Box>
       <LinearProgress
@@ -234,7 +234,7 @@ const Dashboard: React.FC = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="今月の収入"
-            value={`¥${stats.monthlyIncome.toLocaleString()}`}
+            value={`¥${(stats.monthlyIncome || 0).toLocaleString()}`}
             icon={<TrendingUp />}
             color="success"
           />
@@ -242,7 +242,7 @@ const Dashboard: React.FC = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="今月の支出"
-            value={`¥${stats.monthlyExpense.toLocaleString()}`}
+            value={`¥${(stats.monthlyExpense || 0).toLocaleString()}`}
             icon={<TrendingDown />}
             color="error"
           />
@@ -250,7 +250,7 @@ const Dashboard: React.FC = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="収支"
-            value={`¥${stats.monthlyBalance.toLocaleString()}`}
+            value={`¥${(stats.monthlyBalance || 0).toLocaleString()}`}
             icon={<AccountBalance />}
             color="primary"
           />
@@ -273,7 +273,7 @@ const Dashboard: React.FC = () => {
               <Typography variant="h6" gutterBottom>
                 予算の進捗
               </Typography>
-              {budgetData.map((budget, index) => (
+              {(budgetData || []).map((budget, index) => (
                 <BudgetProgress
                   key={index}
                   category={budget.category}
@@ -293,7 +293,7 @@ const Dashboard: React.FC = () => {
               <Typography variant="h6" gutterBottom>
                 最近の取引
               </Typography>
-              {stats.recentTransactions.map((transaction: any) => (
+              {(stats.recentTransactions || []).map((transaction: any) => (
                 <Box
                   key={transaction.id}
                   display="flex"
@@ -315,8 +315,8 @@ const Dashboard: React.FC = () => {
                     }
                     fontWeight="medium"
                   >
-                    {transaction.amount > 0 ? "+" : ""}¥
-                    {transaction.amount.toLocaleString()}
+                    {(transaction.amount || 0) > 0 ? "+" : ""}¥
+                    {(transaction.amount || 0).toLocaleString()}
                   </Typography>
                 </Box>
               ))}

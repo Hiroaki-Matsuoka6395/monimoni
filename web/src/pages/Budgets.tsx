@@ -27,9 +27,9 @@ import {
   Chip,
 } from "@mui/material";
 import { Edit as EditIcon, Add as AddIcon } from "@mui/icons-material";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-import { ja } from "date-fns/locale";
+// import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import { ja } from "date-fns/locale";
 import { formatNumber } from "../utils/formatNumber";
 import { apiClient } from "../api/client";
 
@@ -197,18 +197,13 @@ const Budgets: React.FC = () => {
           予算管理
         </Typography>
         <Box display="flex" gap={2} alignItems="center">
-          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
-            <DatePicker
-              label="対象月"
-              value={selectedMonth}
-              onChange={(newValue: any) =>
-                newValue && setSelectedMonth(newValue)
-              }
-              views={["year", "month"]}
-              format="yyyy年MM月"
-              slotProps={{ textField: { size: "small" } }}
-            />
-          </LocalizationProvider>
+          {/* DatePicker temporarily disabled */}
+          <TextField
+            label="対象月"
+            value={selectedMonth ? `${selectedMonth.getFullYear()}年${String(selectedMonth.getMonth() + 1).padStart(2, '0')}月` : ''}
+            size="small"
+            inputProps={{ readOnly: true }}
+          />
           <Button
             variant="contained"
             startIcon={<AddIcon />}
