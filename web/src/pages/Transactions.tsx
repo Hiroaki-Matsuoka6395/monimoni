@@ -79,6 +79,27 @@ interface TransactionFormData {
   }>
 }
 
+interface Category {
+  id: number
+  name: string
+  type: string
+  household_id: number
+}
+
+interface Account {
+  id: number
+  name: string
+  type: string
+  household_id: number
+}
+
+interface User {
+  id: number
+  name: string
+  email: string
+  is_active: boolean
+}
+
 const Transactions: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
@@ -88,9 +109,9 @@ const Transactions: React.FC = () => {
   const [total, setTotal] = useState(0)
   
   // マスターデータ
-  const [categories, setCategories] = useState<any[]>([])
-  const [accounts, setAccounts] = useState<any[]>([])
-  const [users, setUsers] = useState<any[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [accounts, setAccounts] = useState<Account[]>([])
+  const [users, setUsers] = useState<User[]>([])
   
   // フィルター状態
   const [filters, setFilters] = useState({
@@ -543,7 +564,7 @@ const Transactions: React.FC = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value ? Number(e.target.value) : null }))}
                   >
                     <MenuItem value="">選択なし</MenuItem>
-                    {categories.map((category) => (
+                    {categories && categories.map((category) => (
                       <MenuItem key={category.id} value={category.id}>
                         {category.name}
                       </MenuItem>
@@ -560,7 +581,7 @@ const Transactions: React.FC = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, account_id: e.target.value ? Number(e.target.value) : null }))}
                   >
                     <MenuItem value="">選択なし</MenuItem>
-                    {accounts.map((account) => (
+                    {accounts && accounts.map((account) => (
                       <MenuItem key={account.id} value={account.id}>
                         {account.name} ({account.type})
                       </MenuItem>
@@ -577,7 +598,7 @@ const Transactions: React.FC = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, payer_user_id: e.target.value ? Number(e.target.value) : null }))}
                   >
                     <MenuItem value="">選択なし</MenuItem>
-                    {users.map((user) => (
+                    {users && users.map((user) => (
                       <MenuItem key={user.id} value={user.id}>
                         {user.name}
                       </MenuItem>

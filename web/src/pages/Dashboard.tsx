@@ -15,6 +15,7 @@ import {
   AccountBalance,
   Category,
 } from '@mui/icons-material'
+import { apiClient } from '../api/client'
 
 interface Transaction {
   id: number
@@ -37,6 +38,17 @@ interface Transaction {
   }>
 }
 
+interface Budget {
+  id: number
+  category_id: number
+  category_name: string
+  amount_limit: number
+  amount_spent: number
+  amount_remaining: number
+  percentage: number
+  month: string
+}
+
 interface ApiResponse {
   transactions: Transaction[]
   total: number
@@ -47,18 +59,25 @@ interface ApiResponse {
 
 const Dashboard: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [budgets, setBudgets] = useState<Budget[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchTransactions = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/transactions/')
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+        // 取引データを取得
+        const transactionResponse = await fetch('http://localhost:8000/api/transactions/')
+        if (!transactionResponse.ok) {
+          throw new Error(`HTTP error! status: ${transactionResponse.status}`)
         }
-        const data: ApiResponse = await response.json()
-        setTransactions(data.transactions)
+        const transactionData: ApiResponse = await transactionResponse.json()
+        setTransactions(transactionData.transactions)
+
+        // 予算データを取得
+        const currentMonth = new Date().toISOString().substring(0, 7).replace('-', '')
+        const budgetResponse = await apiClient.get(`/budgets/?month=${currentMonth}`)
+        setBudgets(budgetResponse.data.budgets)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'データの取得に失敗しました')
       } finally {
@@ -66,7 +85,7 @@ const Dashboard: React.FC = () => {
       }
     }
 
-    fetchTransactions()
+    fetchData()
   }, [])
 
   // 実際のデータから統計を計算
@@ -118,11 +137,22 @@ const Dashboard: React.FC = () => {
   const stats = calculateStats()
 
   // TODO: 予算データも実際のAPIから取得する
-  const mockBudgets = [
-    { category: '食費', spent: 45000, limit: 60000, percentage: 75 },
-    { category: '交通費', spent: 15000, limit: 20000, percentage: 75 },
-    { category: '光熱費', spent: 18000, limit: 25000, percentage: 72 },
-  ]
+  if (budgets.length === 0) {
+    // デフォルトの予算データ（予算が設定されていない場合）
+    var budgetData = [
+      { category: '食費', spent: 45000, limit: 60000, percentage: 75 },
+      { category: '交通費', spent: 15000, limit: 20000, percentage: 75 },
+      { category: '光熱費', spent: 18000, limit: 25000, percentage: 72 },
+    ]
+  } else {
+    // 実際の予算データを使用
+    var budgetData = budgets.map(budget => ({
+      category: budget.category_name,
+      spent: budget.amount_spent,
+      limit: budget.amount_limit,
+      percentage: budget.percentage
+    }))
+  }
 
   const StatCard = ({ 
     title, 
@@ -230,8 +260,14 @@ const Dashboard: React.FC = () => {
               <Typography variant="h6" gutterBottom>
                 予算の進捗
               </Typography>
-              {mockBudgets.map((budget, index) => (
-                <BudgetProgress key={index} {...budget} />
+              {budgetData.map((budget, index) => (
+                <BudgetProgress 
+                  key={index}
+                  category={budget.category}
+                  spent={budget.spent}
+                  limit={budget.limit}
+                  percentage={budget.percentage}
+                />
               ))}
             </CardContent>
           </Card>
