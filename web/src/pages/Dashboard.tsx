@@ -303,20 +303,41 @@ const Dashboard: React.FC = () => {
                   borderBottom="1px solid #f0f0f0"
                 >
                   <Box>
-                    <Typography variant="body2">{transaction.memo}</Typography>
+                    <Typography variant="body2">
+                      {transaction.memo || "メモなし"}
+                      {transaction.category && (
+                        <Typography
+                          component="span"
+                          variant="caption"
+                          sx={{
+                            ml: 1,
+                            px: 1,
+                            py: 0.5,
+                            bgcolor: "primary.light",
+                            color: "primary.contrastText",
+                            borderRadius: 1,
+                            fontSize: "0.75rem",
+                          }}
+                        >
+                          {transaction.category.name}
+                        </Typography>
+                      )}
+                    </Typography>
                     <Typography variant="caption" color="textSecondary">
-                      {transaction.date}
+                      {transaction.date} • {transaction.account?.name || "不明"}
                     </Typography>
                   </Box>
                   <Typography
                     variant="body2"
                     color={
-                      transaction.amount > 0 ? "success.main" : "error.main"
+                      transaction.type === "income"
+                        ? "success.main"
+                        : "error.main"
                     }
                     fontWeight="medium"
                   >
-                    {(transaction.amount || 0) > 0 ? "+" : ""}¥
-                    {(transaction.amount || 0).toLocaleString()}
+                    {transaction.type === "income" ? "+" : "-"}¥
+                    {(transaction.amount_total || 0).toLocaleString()}
                   </Typography>
                 </Box>
               ))}
