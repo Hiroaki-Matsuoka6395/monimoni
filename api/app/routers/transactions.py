@@ -169,6 +169,7 @@ def create_transaction(transaction_data: dict, db: Session = Depends(get_db)):
             raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
 
         # トランザクションの作成
+        now = datetime.now()
         new_transaction = Transaction(
             household_id=1,  # 田中家固定
             date=transaction_date,
@@ -180,7 +181,9 @@ def create_transaction(transaction_data: dict, db: Session = Depends(get_db)):
             split_ratio_payer=float(transaction_data.get("split_ratio_payer", 50)) / 100.0,
             memo=transaction_data.get("memo", ""),
             has_receipt=False,  # デフォルトでfalse
-            created_by=transaction_data.get("payer_user_id", 1)  # 作成者は支払者と同じ
+            created_by=transaction_data.get("payer_user_id", 1),  # 作成者は支払者と同じ
+            created_at=now,
+            updated_at=now
         )
 
         db.add(new_transaction)
@@ -307,6 +310,9 @@ def update_transaction(transaction_id: int, transaction_data: dict, db: Session 
             transaction.memo = transaction_data["memo"]
         if "split_ratio_payer" in transaction_data:
             transaction.split_ratio_payer = float(transaction_data["split_ratio_payer"]) / 100.0
+
+        # 更新時刻を設定
+        transaction.updated_at = datetime.now()
 
         # アイテムの更新（既存のアイテムを削除して新しく追加）
         if "items" in transaction_data:
