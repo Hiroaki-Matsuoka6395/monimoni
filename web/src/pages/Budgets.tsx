@@ -200,7 +200,11 @@ const Budgets: React.FC = () => {
           {/* DatePicker temporarily disabled */}
           <TextField
             label="対象月"
-            value={selectedMonth ? `${selectedMonth.getFullYear()}年${String(selectedMonth.getMonth() + 1).padStart(2, '0')}月` : ''}
+            value={
+              selectedMonth
+                ? `${selectedMonth.getFullYear()}年${String(selectedMonth.getMonth() + 1).padStart(2, "0")}月`
+                : ""
+            }
             size="small"
             inputProps={{ readOnly: true }}
           />

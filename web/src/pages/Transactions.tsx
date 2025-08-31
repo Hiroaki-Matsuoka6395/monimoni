@@ -124,7 +124,13 @@ const Transactions: React.FC = () => {
 
   // ダイアログ状態
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null);
   const [creating, setCreating] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [formData, setFormData] = useState<TransactionFormData>({
     date: new Date().toISOString().split("T")[0],
     type: "expense",
@@ -300,7 +306,91 @@ const Transactions: React.FC = () => {
     }
   };
 
-  if (loading && transactions.length === 0) {
+  // 編集ハンドラー
+  const handleEditTransaction = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setFormData({
+      date: transaction.date,
+      type: transaction.type,
+      amount_total: transaction.amount_total,
+      account_id: transaction.account?.id || null,
+      category_id: transaction.category?.id || null,
+      payer_user_id: transaction.payer_user?.id || null,
+      memo: transaction.memo,
+      split_ratio_payer: transaction.split_ratio_payer * 100,
+      items: transaction.items || [],
+    });
+    setEditDialogOpen(true);
+  };
+
+  // 更新ハンドラー
+  const handleUpdateTransaction = async () => {
+    if (!selectedTransaction) return;
+
+    try {
+      setUpdating(true);
+      setError(null);
+
+      // バリデーション
+      if (!formData.date) {
+        setError("日付は必須です");
+        return;
+      }
+      if (!formData.amount_total || formData.amount_total <= 0) {
+        setError("金額は0より大きい値を入力してください");
+        return;
+      }
+
+      const response = await api.transactions.update(
+        selectedTransaction.id,
+        formData
+      );
+
+      if (response.status === 200) {
+        setEditDialogOpen(false);
+        setSelectedTransaction(null);
+        // データ再取得
+        await fetchTransactions();
+      }
+    } catch (err: any) {
+      console.error("Error updating transaction:", err);
+      setError(err.response?.data?.detail || "取引の更新に失敗しました");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  // 削除確認ハンドラー
+  const handleDeleteConfirm = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setDeleteDialogOpen(true);
+  };
+
+  // 削除ハンドラー
+  const handleDeleteTransaction = async () => {
+    if (!selectedTransaction) return;
+
+    try {
+      setDeleting(true);
+      setError(null);
+
+      const response = await api.transactions.delete(selectedTransaction.id);
+
+      if (response.status === 200) {
+        setDeleteDialogOpen(false);
+        setSelectedTransaction(null);
+        // データ再取得
+        await fetchTransactions();
+      }
+    } catch (err: any) {
+      console.error("Error deleting transaction:", err);
+      setError(err.response?.data?.detail || "取引の削除に失敗しました");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  if (loading && (transactions || []).length === 0) {
     return (
       <Box
         display="flex"
@@ -430,7 +520,7 @@ const Transactions: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {transactions.map((transaction) => (
+              {(transactions || []).map((transaction) => (
                 <TableRow key={transaction.id} hover>
                   <TableCell>
                     {new Date(transaction.date).toLocaleDateString("ja-JP")}
@@ -479,19 +569,27 @@ const Transactions: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <Tooltip title="編集">
-                      <IconButton size="small" color="primary">
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleEditTransaction(transaction)}
+                      >
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="削除">
-                      <IconButton size="small" color="error">
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDeleteConfirm(transaction)}
+                      >
                         <DeleteIcon />
                       </IconButton>
                     </Tooltip>
                   </TableCell>
                 </TableRow>
               ))}
-              {transactions.length === 0 && !loading && (
+              {(transactions || []).length === 0 && !loading && (
                 <TableRow>
                   <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
                     <Typography variant="body2" color="textSecondary">
@@ -699,6 +797,232 @@ const Transactions: React.FC = () => {
             disabled={creating || !formData.amount_total}
           >
             {creating ? <CircularProgress size={20} /> : "作成"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 編集ダイアログ */}
+      <Dialog
+        open={editDialogOpen}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setSelectedTransaction(null);
+        }}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>取引を編集</DialogTitle>
+        <DialogContent>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          <Box sx={{ pt: 1 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="日付"
+                  type="date"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={formData.date}
+                  onChange={(e: any) =>
+                    setFormData((prev: any) => ({
+                      ...prev,
+                      date: e.target.value,
+                    }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>取引タイプ</InputLabel>
+                  <Select
+                    value={formData.type}
+                    label="取引タイプ"
+                    onChange={(e: any) =>
+                      setFormData((prev: any) => ({
+                        ...prev,
+                        type: e.target.value,
+                      }))
+                    }
+                  >
+                    <MenuItem value="income">収入</MenuItem>
+                    <MenuItem value="expense">支出</MenuItem>
+                    <MenuItem value="transfer">振替</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="金額"
+                  type="number"
+                  fullWidth
+                  value={formData.amount_total}
+                  onChange={(e: any) =>
+                    setFormData((prev: any) => ({
+                      ...prev,
+                      amount_total: parseFloat(e.target.value) || 0,
+                    }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>アカウント</InputLabel>
+                  <Select
+                    value={formData.account_id || ""}
+                    label="アカウント"
+                    onChange={(e: any) =>
+                      setFormData((prev: any) => ({
+                        ...prev,
+                        account_id: e.target.value || null,
+                      }))
+                    }
+                  >
+                    <MenuItem value="">選択してください</MenuItem>
+                    {(accounts || []).map((account) => (
+                      <MenuItem key={account.id} value={account.id}>
+                        {account.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>カテゴリ</InputLabel>
+                  <Select
+                    value={formData.category_id || ""}
+                    label="カテゴリ"
+                    onChange={(e: any) =>
+                      setFormData((prev: any) => ({
+                        ...prev,
+                        category_id: e.target.value || null,
+                      }))
+                    }
+                  >
+                    <MenuItem value="">選択してください</MenuItem>
+                    {(categories || []).map((category) => (
+                      <MenuItem key={category.id} value={category.id}>
+                        {category.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>支払者</InputLabel>
+                  <Select
+                    value={formData.payer_user_id || ""}
+                    label="支払者"
+                    onChange={(e: any) =>
+                      setFormData((prev: any) => ({
+                        ...prev,
+                        payer_user_id: e.target.value || null,
+                      }))
+                    }
+                  >
+                    <MenuItem value="">選択してください</MenuItem>
+                    {(users || []).map((user) => (
+                      <MenuItem key={user.id} value={user.id}>
+                        {user.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="メモ"
+                  fullWidth
+                  multiline
+                  rows={2}
+                  value={formData.memo}
+                  onChange={(e: any) =>
+                    setFormData((prev: any) => ({
+                      ...prev,
+                      memo: e.target.value,
+                    }))
+                  }
+                />
+              </Grid>
+            </Grid>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setEditDialogOpen(false);
+              setSelectedTransaction(null);
+            }}
+          >
+            キャンセル
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleUpdateTransaction}
+            disabled={updating}
+          >
+            {updating ? <CircularProgress size={20} /> : "更新"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 削除確認ダイアログ */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setSelectedTransaction(null);
+        }}
+      >
+        <DialogTitle>取引を削除</DialogTitle>
+        <DialogContent>
+          <Typography>
+            この取引を削除してもよろしいですか？この操作は取り消せません。
+          </Typography>
+          {selectedTransaction && (
+            <Box sx={{ mt: 2, p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
+              <Typography variant="body2">
+                <strong>日付:</strong>{" "}
+                {new Date(selectedTransaction.date).toLocaleDateString("ja-JP")}
+              </Typography>
+              <Typography variant="body2">
+                <strong>金額:</strong>{" "}
+                {formatAmount(
+                  selectedTransaction.amount_total,
+                  selectedTransaction.type
+                )}
+              </Typography>
+              <Typography variant="body2">
+                <strong>カテゴリ:</strong>{" "}
+                {selectedTransaction.category?.name || "-"}
+              </Typography>
+              <Typography variant="body2">
+                <strong>メモ:</strong> {selectedTransaction.memo || "-"}
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setDeleteDialogOpen(false);
+              setSelectedTransaction(null);
+            }}
+          >
+            キャンセル
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDeleteTransaction}
+            disabled={deleting}
+          >
+            {deleting ? <CircularProgress size={20} /> : "削除"}
           </Button>
         </DialogActions>
       </Dialog>
