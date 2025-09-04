@@ -5,7 +5,6 @@ from sqlalchemy import (
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from datetime import datetime
 import enum
 
 Base = declarative_base()
@@ -34,7 +33,7 @@ class Household(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
-    created_at = Column(DateTime, default=func.now(), nullable=False)
+    created_at = Column(DateTime, default=func.now, nullable=False)
 
     # Relationships
     users = relationship("User", back_populates="household")
@@ -54,7 +53,7 @@ class User(Base):
     email = Column(String(255), nullable=True)
     auth_type = Column(Enum(AuthType), default=AuthType.pin, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
-    created_at = Column(DateTime, default=func.now(), nullable=False)
+    created_at = Column(DateTime, default=func.now, nullable=False)
 
     # Relationships
     household = relationship("Household", back_populates="users")
@@ -111,8 +110,8 @@ class Transaction(Base):
     memo = Column(Text, nullable=True)
     has_receipt = Column(Boolean, default=False, nullable=False)
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
-    created_at = Column(DateTime, default=func.now(), nullable=False)
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    created_at = Column(DateTime, default=func.now, nullable=False)
+    updated_at = Column(DateTime, default=func.now, onupdate=func.now, nullable=False)
 
     # Relationships
     household = relationship("Household", back_populates="transactions")
@@ -174,7 +173,7 @@ class Receipt(Base):
     mime_type = Column(String(100), nullable=False)
     size = Column(Integer, nullable=False)
     storage_path = Column(String(500), nullable=False)
-    created_at = Column(DateTime, default=func.now(), nullable=False)
+    created_at = Column(DateTime, default=func.now, nullable=False)
 
     # Relationships
     transaction = relationship("Transaction", back_populates="receipts")
@@ -207,7 +206,7 @@ class AuditLog(Base):
     entity_id = Column(Integer, nullable=False)
     action = Column(String(32), nullable=False)
     payload_json = Column(JSON, nullable=True)
-    created_at = Column(DateTime, default=func.now(), nullable=False)
+    created_at = Column(DateTime, default=func.now, nullable=False)
 
     # Relationships
     user = relationship("User", back_populates="audit_logs")
